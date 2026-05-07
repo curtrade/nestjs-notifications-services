@@ -10,6 +10,7 @@ services:
       - "3001:3001"
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
     environment:
       NODE_ENV: development
       PORT: 3001
@@ -64,6 +65,7 @@ services:
       - 9230:9230
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
       interval: 15s
@@ -95,6 +97,7 @@ services:
       - 9231:9231
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3003/health"]
       interval: 15s
