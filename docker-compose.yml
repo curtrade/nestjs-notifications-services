@@ -1,0 +1,110 @@
+services:
+  telegram-notifications:
+    build:
+      context: .
+      dockerfile: apps/telegram-notifications/Dockerfile
+      target: development
+    container_name: telegram-notifications-service
+    command: npm run start:dev telegram-notifications
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/usr/src/app
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      TELEGRAM_API_TOKEN: ${TELEGRAM_API_TOKEN:-8096394029:AAH0F2-ITiEyQ4evDBGO0-fjo54P6UoTMGQ}
+      TELEGRAM_API_URL: ${TELEGRAM_API_URL:-https://api.telegram.org}
+      CORS_ORIGIN: "http://localhost:3001"
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    networks:
+      - microservices-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  producer:
+    build:
+      context: .
+      dockerfile: apps/producer/Dockerfile
+      target: development
+    container_name: producer-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    command: npm run start:debug:producer
+    environment:
+      NODE_ENV: development
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
+      QUEUE: ${QUEUE:-events_queue}
+      RETRIES: 3
+      ATTEMPT_DELAY_MULTIPLICATOR: 1000
+    networks:
+      - microservices-network
+    restart: unless-stopped
+    ports:
+      - 3002:3002
+      - 9230:9230
+    volumes:
+      - .:/usr/src/app
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  consumer:
+    build:
+      context: .
+      dockerfile: apps/consumer/Dockerfile
+      target: development
+    container_name: consumer-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    command: npm run start:debug:consumer
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
+      QUEUE: ${QUEUE:-events_queue}
+      RETRIES: 3
+      ATTEMPT_DELAY_MULTIPLICATOR: 1000
+    networks:
+      - microservices-network
+    ports:
+      - 3003:3003
+      - 9231:9231
+    volumes:
+      - .:/usr/src/app
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3003/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  microservices-network:
+    driver: bridge
