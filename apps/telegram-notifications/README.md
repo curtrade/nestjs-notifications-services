@@ -2,8 +2,15 @@
 
 Микросервис для отправки уведомлений в Telegram, построенный на базе NestJS.
 
+## API документация (Swagger)
+
+Интерактивная документация доступна после запуска сервиса:
+
+- **Swagger UI:** http://localhost:3001/api/docs
+- **OpenAPI JSON:** http://localhost:3001/api/docs-json
+
 ## API Endpoints
-yf
+
 ### POST /notifications/send
 
 Отправка сообщения в Telegram.

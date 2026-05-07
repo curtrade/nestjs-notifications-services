@@ -40,6 +40,16 @@
 
 - **consumer** - микросервис для обработки событий из очереди RabbitMQ (порт 3003)
 
+### API документация (Swagger)
+
+После запуска сервисов интерактивная документация доступна по адресам:
+
+| Сервис | Swagger UI | OpenAPI JSON |
+|--------|-----------|--------------|
+| Telegram Notifications | http://localhost:3001/api/docs | http://localhost:3001/api/docs-json |
+| Producer | http://localhost:3002/api/docs | http://localhost:3002/api/docs-json |
+| Consumer | http://localhost:3003/api/docs | http://localhost:3003/api/docs-json |
+
 ### Запуск проекта
 
 1. Запустите микросервисы командой `docker-compose up`

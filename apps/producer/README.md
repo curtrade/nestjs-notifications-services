@@ -2,6 +2,13 @@
 
 Микросервис для приёма HTTP-запросов и публикации событий в очередь RabbitMQ. Построен на базе NestJS.
 
+## API документация (Swagger)
+
+Интерактивная документация доступна после запуска сервиса:
+
+- **Swagger UI:** http://localhost:3002/api/docs
+- **OpenAPI JSON:** http://localhost:3002/api/docs-json
+
 ## API Endpoints
 
 ### POST /events
