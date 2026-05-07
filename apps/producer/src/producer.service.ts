@@ -62,7 +62,7 @@ export class ProducerService implements OnModuleInit, OnModuleDestroy {
     const messageId = uuidv4();
     const payload = JSON.stringify({ id: messageId, ...data });
 
-    for (let attempt = 0; attempt < retries; attempt++) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         this.channel.sendToQueue(this.rabbitmqConfig.queue, Buffer.from(payload), { persistent: true });
         await this.channel.waitForConfirms();

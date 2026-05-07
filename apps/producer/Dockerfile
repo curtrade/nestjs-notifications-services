@@ -18,6 +18,6 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY package-lock.json ./
 
-RUN npm ci -omit=dev
+RUN npm ci --omit=dev
 COPY --from=development /usr/src/app/dist ./dist
 CMD ["node","dist/apps/producer/main"]
